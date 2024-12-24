@@ -6,14 +6,20 @@
 
     <div class="product-info">
       <h1>{{ title }}</h1>
-      <p v-if="inStock">In stock</p>
-      <p v-else>Out of Stock</p>
+			<p>{{ description }}</p>
+      <p v-if="inStock" >In stock</p>
+      <p v-else :class="{ outOfStock: !inStock }">Out of Stock</p>
       <p>Shipping: {{ shipping }}</p>
 			<p>User is premium: {{ premium }}</p>
-
+			<p>{{ sale }}</p>
+			<a :href="link">Перейди по ссылке для деньги бесплатно!</a>
       <ul>
         <li v-for="detail in details" :key="detail">{{ detail }}</li>
       </ul>
+			<ul>
+        <li v-for="size in sizes" :key="size">{{ size }}</li>
+      </ul>
+			<span v-if="onSale">Скидка!!!!</span>
       <div
         class="color-box"
         v-for="(variant, index) in variants"
@@ -29,6 +35,12 @@
       >
         Add to cart
       </button>
+			<button
+				@click="MinCart"
+				class="delete"
+			>
+			Delete to Cart
+			</button>
 
       <div class="cart">
         <p>Cart({{ cart }})</p>
@@ -47,7 +59,11 @@ export default {
     selectedVariant: 0,
 		altText: 'The socks',
 		shipping: 'Free',
+		onSale: true,
+		link: 'https://github.com/github-copilot/signup',
+		description: 'Шерсть носки круто!',
 		premium: true,
+		sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
     details: ['80% cotton', '20% polyester', 'Gender-neutral'],
     variants: [
       {
@@ -70,6 +86,9 @@ export default {
     addToCart() {
       this.cart += 1;
     },
+		MinCart() {
+			if (this.cart != 0) this.cart -= 1;
+		},
     updateProduct(index) {
       this.selectedVariant = index;
       console.log(index);
@@ -90,8 +109,14 @@ export default {
       return this.variants[this.selectedVariant].variantImage;
     },
     inStock(){
-      return this.variants[this.selectedVariant].variantQuantity;
-    }
+      return this.variants[this.selectedVariant].variantQuantity
+    },
+		sale() {
+			if (this.onSale) {
+				return this.brand + ' ' + this.product + ' are on sale!'
+			} 
+				return  this.brand + ' ' + this.product + ' are not on sale'
+		}
   }
 }
 </script>
@@ -104,6 +129,10 @@ body {
     margin: 0px;
   }
   
+	.outOfStock {
+  text-decoration: line-through;
+	}
+
   .nav-bar {
     background: linear-gradient(-90deg, #84CF6A, #16C0B0);
     height: 60px;
@@ -155,7 +184,10 @@ body {
     width: 100px;
     font-size: 14px;
   } 
-  
+  .delete {
+		margin-left: 10px;
+	}
+
   .disabledButton {
     background-color: #d8d8d8;
   }
